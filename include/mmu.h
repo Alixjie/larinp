@@ -1,3 +1,6 @@
+#ifndef INCLUDE_MMU_H
+#define INCLUDE_MMU_H
+
 // EFLAGS寄存器 中断允许标志位
 #define FL_IF 0x00000200
 
@@ -16,8 +19,6 @@
 #define SEG_UCODE 3 // 用户代码段
 #define SEG_UDATA 4 // 用户数据 + 堆栈段
 #define SEG_TSS 5   // 进程状态段
-
-#ifndef SEGDESC
 
 // 段描述符结构体
 struct segdesc
@@ -53,8 +54,6 @@ struct segdesc
             ((uint_t)(base) >> 16) & 0xff, type, 1, dpl, 1,     \
             (uint_t)(lim) >> 16, 0, 0, 1, 0, (uint_t)(base) >> 24 \
     }
-
-#endif
 
 #define DPL_USER 0x3   // 用户 DPL
 #define DPL_KERNEL 0x0 // Kernel DPL
@@ -99,8 +98,6 @@ struct segdesc
 
 #define PTE_ADDR(pte) ((uint_t)(pte) & ~0xFFF)
 #define PTE_FLAGS(pte) ((uint_t)(pte)&0xFFF)
-
-#ifndef SEGDESC
 
 // TSS段（进程状态段）
 struct taskstate
