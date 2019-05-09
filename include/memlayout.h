@@ -16,7 +16,7 @@
 #define KERNLINK (KERNBASE + EXTMEM)
 
 // 传值是指针
-#define V2P_P(a) (((uint)(a)) - KERNBASE)
+#define V2P_P(a) (((uint_t)(a)) - KERNBASE)
 #define P2V_P(a) ((void *)(((char *)(a)) + KERNBASE))
 
 // 传值是地址
