@@ -15,6 +15,9 @@ ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 
 all: $(S_OBJECTS) $(C_OBJECTS) link update_image 
 
+boot.o:boot/boot.S
+	$(GCC) $(CFLAGS) -c boot.S -o boot.o
+
 .c.o:
 	@echo 编译代码文件 $< ...
 	$(CC) -c $(C_FLAGS) $< -o $@
