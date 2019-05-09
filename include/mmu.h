@@ -46,7 +46,7 @@ struct segdesc
             (uint_t)(lim) >> 28, 0, 0, 1, 1, (uint_t)(base) >> 24 \
     }
 
-#define SEG_TSS(type, base, lim, dpl)                         \
+#define SEG_T(type, base, lim, dpl)                         \
     (struct segdesc)                                          \
     {                                                         \
         (lim) & 0xffff, (uint_t)(base)&0xffff,                  \
