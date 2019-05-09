@@ -32,7 +32,7 @@ entry:
   orl     $(CR0_PG|CR0_WP), %eax
   movl    %eax, %cr0
 
-  movl %ebx, $glb_mboot_ptr
+  movl %ebx, (glb_mboot_ptr)
 
   # 设置内核栈
   movl $stack, %esp
@@ -42,7 +42,7 @@ entry:
 
 .bss
 glb_mboot_ptr:
-    skip 4
+    .skip 4
 
-    skip KSTACKSIZE
+    .skip KSTACKSIZE
 stack:
