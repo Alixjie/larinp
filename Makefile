@@ -9,7 +9,7 @@ CC = gcc
 LD = ld 
 ASM = gas
 
-C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -no-pie -fno-pic -I include
+C_FLAGS = -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -no-pie -fno-pic -I include
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 
@@ -17,7 +17,7 @@ all: $(S_OBJECTS) $(C_OBJECTS) link update_image
 
 .c.o:
 	@echo 编译代码文件 $< ...
-	$(CC) $(C_FLAGS) $< -o $@
+	$(CC) -c $(C_FLAGS) $< -o $@
 
 .S.o:
 	@echo 编译汇编文件 $< ...
