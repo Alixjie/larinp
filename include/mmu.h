@@ -1,6 +1,3 @@
-#ifndef INCLUDE_MMU_H
-#define INCLUDE_MMU_H
-
 // EFLAGS寄存器 中断允许标志位
 #define FL_IF 0x00000200
 
@@ -20,6 +17,7 @@
 #define SEG_UDATA 4 // 用户数据 + 堆栈段
 #define SEG_TSS 5   // 进程状态段
 
+#ifndef __ASSEMBLER__
 // 段描述符结构体
 struct segdesc
 {
@@ -39,21 +37,23 @@ struct segdesc
 };
 
 // 设置段描述符
-#define SEG(type, base, lim, dpl)                             \
-    (struct segdesc)                                          \
-    {                                                         \
-        ((lim) >> 12) & 0xffff, (uint_t)(base)&0xffff,          \
-            ((uint_t)(base) >> 16) & 0xff, type, 1, dpl, 1,     \
+#define SEG(type, base, lim, dpl)                                 \
+    (struct segdesc)                                              \
+    {                                                             \
+        ((lim) >> 12) & 0xffff, (uint_t)(base)&0xffff,            \
+            ((uint_t)(base) >> 16) & 0xff, type, 1, dpl, 1,       \
             (uint_t)(lim) >> 28, 0, 0, 1, 1, (uint_t)(base) >> 24 \
     }
 
-#define SEG_T(type, base, lim, dpl)                         \
-    (struct segdesc)                                          \
-    {                                                         \
-        (lim) & 0xffff, (uint_t)(base)&0xffff,                  \
-            ((uint_t)(base) >> 16) & 0xff, type, 1, dpl, 1,     \
+#define SEG_T(type, base, lim, dpl)                               \
+    (struct segdesc)                                              \
+    {                                                             \
+        (lim) & 0xffff, (uint_t)(base)&0xffff,                    \
+            ((uint_t)(base) >> 16) & 0xff, type, 1, dpl, 1,       \
             (uint_t)(lim) >> 16, 0, 0, 1, 0, (uint_t)(base) >> 24 \
     }
+
+#endif
 
 #define DPL_USER 0x3   // 用户 DPL
 #define DPL_KERNEL 0x0 // Kernel DPL
@@ -99,11 +99,13 @@ struct segdesc
 #define PTE_ADDR(pte) ((uint_t)(pte) & ~0xFFF)
 #define PTE_FLAGS(pte) ((uint_t)(pte)&0xFFF)
 
+#ifndef __ASSEMBLER__
+
 // TSS段（进程状态段）
 struct taskstate
 {
     uint_t link;
-    uint_t esp0;    // 内核态堆栈指针
+    uint_t esp0;  // 内核态堆栈指针
     ushort_t ss0; // 内核态堆栈段
     ushort_t padding1;
     uint_t *esp1;
@@ -112,7 +114,7 @@ struct taskstate
     uint_t *esp2;
     ushort_t ss2;
     ushort_t padding3;
-    void *cr3; // 页目录基址
+    void *cr3;   // 页目录基址
     uint_t *eip; // 切换进程时的 EIP
     uint_t eflags;
     uint_t eax;
@@ -159,7 +161,7 @@ struct gatedesc
 // istrap: 1 陷阱门, 0 中断门
 #define SETGATE(gate, istrap, sel, off, d)            \
     {                                                 \
-        (gate).off_15_0 = (uint_t)(off)&0xffff;         \
+        (gate).off_15_0 = (uint_t)(off)&0xffff;       \
         (gate).cs = (sel);                            \
         (gate).args = 0;                              \
         (gate).rsv1 = 0;                              \
@@ -167,7 +169,7 @@ struct gatedesc
         (gate).s = 0;                                 \
         (gate).dpl = (d);                             \
         (gate).p = 1;                                 \
-        (gate).off_31_16 = (uint_t)(off) >> 16;         \
+        (gate).off_31_16 = (uint_t)(off) >> 16;       \
     }
 
 #endif

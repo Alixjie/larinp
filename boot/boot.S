@@ -35,14 +35,14 @@ entry:
   movl %ebx, $glb_mboot_ptr
 
   # 设置内核栈
-  movl $(stack - 1), %esp
+  movl $stack, %esp
 
   mov $main, %eax
   jmp *%eax
 
 .bss
 glb_mboot_ptr:
-    skip 1, 4, 0
+    skip 4
 
-    skip KSTACKSIZE, 1, 0
+    skip KSTACKSIZE
 stack:
