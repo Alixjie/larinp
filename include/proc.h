@@ -49,5 +49,5 @@ struct proc
     char name[16];              // 进程名
 
     uint_t priority;     // 用于优先级调度
-    struct dentry thisp; // 用于后续扩展缺页中断时加载 伟哥
+    struct dentry *thisp; // 用于后续扩展缺页中断时加载 伟哥
 };
