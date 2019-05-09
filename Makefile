@@ -9,6 +9,8 @@ CC = gcc
 LD = ld 
 ASM = gas
 
+CFLAGS=-m32 -ggdb -gstabs+ -fno-stack-protector -fno-builtin -fno-strict-aliasing -O0 -Wall -fno-pic -nostdinc  -I include
+
 C_FLAGS = -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -no-pie -fno-pic -I include
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
@@ -16,7 +18,7 @@ ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 all: $(S_OBJECTS) $(C_OBJECTS) link update_image 
 
 boot.o:boot/boot.S
-	$(CC) $(C_FLAGS) -c boot.S -o boot.o
+	$(CC) $(CFLAGS) -c boot/boot.S -o boot.o
 
 .c.o:
 	@echo 编译代码文件 $< ...
