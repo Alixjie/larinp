@@ -31,6 +31,8 @@ SECTIONS
 
     . = ALIGN(0x1000);
 
+    PROVIDE( kern_data = . );
+
     .data : AT(ADDR(.data) - 0xC0000000)
     {
         *(.data) 
