@@ -8,8 +8,6 @@ struct cpu
     struct proc *proc;           // 当前运行进程（进程 / null）
 };
 
-static struct cpu cpu0;
-
 //当前线程上下文（用于schedule()、sche()切换线程）
 struct context
 {

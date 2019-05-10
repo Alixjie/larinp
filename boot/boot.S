@@ -24,7 +24,7 @@ entry:
   movl    %eax, %cr4
 
   # 设置临时页目录
-  movl    $(V2P_A(entrypgdir)), %eax
+  movl    $(V2P_A(tempgdir)), %eax
   movl    %eax, %cr3
 
   # 开启分页

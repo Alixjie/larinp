@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "memlayout.h": "c",
+        "debug.h": "c",
+        "limits": "c"
+    }
+}

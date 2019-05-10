@@ -28,7 +28,6 @@ SECTIONS
         *(.stabstr)
         . = ALIGN(4096);
     }
-    PROVIDE( kern_end = . );
 
     . = ALIGN(0x1000);
 
@@ -44,7 +43,7 @@ SECTIONS
         . = ALIGN(4096);
     }
 
-    PROVIDE(end = .);
+    PROVIDE( kern_end = . );
 
     /DISCARD/ : { *(.comment) *(.eh_frame) }
 }
