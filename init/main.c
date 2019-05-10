@@ -13,6 +13,8 @@ extern char kern_end[];
 
 int main(void)
 {
+    console_clear();
+
     printk("Test printk funciton!\n");
 
     recyclemem(kern_end, P2V_P(4 * 1024 * 1024));

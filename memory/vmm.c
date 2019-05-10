@@ -6,7 +6,7 @@
 #include "proc.h"
 #include "vmm.h"
 #include "multiboot.h"
-#include "elf.h"
+//#include "elf.h"
 
 // 内核数据段开始 data + bss
 extern char kern_data[];
@@ -23,8 +23,8 @@ void gdt_init(void)
 static struct kmap
 {
     void *virt;
-    uint phys_start;
-    uint phys_end;
+    uint_t phys_start;
+    uint_t phys_end;
     int perm;
 } kmap[] = {
     {(void *)KERNBASE, 0, EXTMEM, PTE_W},                // 1M 内空间
@@ -34,14 +34,14 @@ static struct kmap
 
 void dct_phy_mem(void)
 {
-    glb_mboot_ptr = P2V_A(glb_mboot_ptr);
+    glb_mboot_ptr = P2V_P(glb_mboot_ptr);
     // 测试 glb_mboot_ptr 的地址是否转换成功
     printk("%08x\n", glb_mboot_ptr);
 
     uint_t mmap_addr = glb_mboot_ptr->mmap_addr;
     uint_t mmap_length = glb_mboot_ptr->mmap_length;
 
-    for (mmap_entry_t *mmap = (mmap_entry_t *)mmap_addr; (uint32_t)mmap < mmap_addr + mmap_length; ++mmap)
+    for (mmap_entry_t *mmap = (mmap_entry_t *)mmap_addr; (uint_t)mmap < mmap_addr + mmap_length; ++mmap)
     {
         if ((mmap->type == 1) && (mmap->base_addr_low == 0x100000))
         {
