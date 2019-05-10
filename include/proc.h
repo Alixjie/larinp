@@ -49,3 +49,7 @@ struct proc
     uint_t priority;     // 用于优先级调度
     struct dentry *thisp; // 用于后续扩展缺页中断时加载 伟哥
 };
+
+struct cpu *getcpu(void);
+
+struct proc *getproc(void);

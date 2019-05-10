@@ -1,3 +1,5 @@
+#include "types.h"
+
 // 向IO端口输出一个字节
 static inline void outb(ushort_t port, uchar_t value)
 {

@@ -1,7 +1,7 @@
 #include "x86.h"
 #include "console.h"
 #include "memlayout.h"
-
+#include "types.h"
 
 static ushort_t *video_memory_start = (ushort_t *)P2V_A(0xB8000);
 

@@ -1,10 +1,10 @@
 #include "time.h"
-#include "idt.h"
+//#include "idt.h"
 #include "x86.h"
 
 void init_timer(uint_t frequency)
 {
-    register_interrupt_handler((uchar_t)IRQ0, timer_callback);
+ //   register_interrupt_handler((uchar_t)IRQ0, timer_callback);
 
     // Intel 8253/8254 PIT芯片 I/O端口地址范围是40h~43h
 	// 输入频率为 1193180，frequency 即每秒中断次数
