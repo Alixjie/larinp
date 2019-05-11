@@ -5,6 +5,7 @@
 #include "lock.h"
 #include "debug.h"
 #include "string.h"
+#include "kalloc.h"
 
 void dorecycle(void *vstart, void *vend);
 extern char kern_end[];
@@ -43,7 +44,7 @@ void dorecycle(void *vstart, void *vend)
 }
 
 // 释放一个 4K 页
-void memfree(char *free)
+void memfree(char_t *free)
 {
     if ((uint_t)free % PGSIZE || free < kern_end || V2P_P(free) >= PHYSTOP)
         printk("mfree");

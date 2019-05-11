@@ -65,3 +65,5 @@ void backtouser(void);
 
 // 内核态调度线程
 void scheduler(void);
+
+void swtch(struct context**, struct context*);

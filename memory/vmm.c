@@ -9,6 +9,7 @@
 #include "string.h"
 #include "debug.h"
 //#include "elf.h"
+#include "lock.h"
 
 // 内核数据段开始 data + bss
 extern char kern_data[];
@@ -129,7 +130,7 @@ pde_t *build_kvm(void)
     for (struct kmap *k = kmap; k < &kmap[NUMOFELE(kmap)]; ++k)
         if (mapping(pgdir, k->virt, k->phys_end - k->phys_start, (uint_t)k->phys_start, k->perm) < 0)
         {
-            memfree(pgdir);
+            memfree((char_t *)pgdir);
             return FALSE;
         }
     return pgdir;
@@ -148,11 +149,11 @@ void switchkvm(void)
     lcr3(V2P_P(kpgdir));
 }
 
-void firstuvm(pde_t *pgdir, uchar_t *init, uint_t sz)
+void firstuvm(pde_t *pgdir, char_t *init, uint_t sz)
 {
     if (sz >= PGSIZE)
         printk("firstuvm: first process must small than 4KB");
-    uchar_t *mem = memalloc();
+    char_t *mem = memalloc();
     memset(mem, 0, PGSIZE);
     // 将用户空间 0 字节开始的 4K 页映射到申请的物理内存上（申请的物理内存是虚拟地址 需要做转化）
     mapping(pgdir, 0, PGSIZE, V2P_P(mem), PTE_W | PTE_U);
@@ -179,6 +180,6 @@ void changeuvm(struct proc *p)
     getcpu()->ts.iomb = (ushort_t)0xFFFF;
     // 加载 tr 寄存器 设置进程页目录表
     ltr(SEG_TSS << 3);
-    lcr3(V2P(p->pgdir));
+    lcr3(V2P_P(p->pgdir));
     vcli();
 }

@@ -11,7 +11,7 @@ void recyclemem(void *vstart, void *vend);
 void dorecycle(void *vstart, void *vend);
 
 // 释放一个 4K 页
-void memfree(char *free);
+void memfree(char_t *free);
 
 // 申请一个 4K 页
 char *memalloc(void);

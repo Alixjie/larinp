@@ -24,9 +24,11 @@ void build_kpgdir(void);
 pde_t *build_kvm(void);
 
 // 第一次加载用户程序时使用（进程附带在内核上）
-void firstuvm(pde_t *pgdir, uchar_t *init, uint_t sz);
+void firstuvm(pde_t *pgdir, char_t *init, uint_t sz);
 
 // 恢复进程的有些属性（主要是 TSS ）
 void changeuvm(struct proc *p);
+
+void switchkvm(void);
 
 #endif

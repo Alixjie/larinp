@@ -11,4 +11,16 @@ struct lock
     //uint_t procallstack[10];  // 函数调用过程
 };
 
+void initlock(struct lock *lk, char *name);
+
+void acquire(struct lock *lk);
+
+void release(struct lock *lk);
+
+int alrdyhold(struct lock *lock);
+
+void pcli(void);
+
+void vcli(void);
+
 #endif

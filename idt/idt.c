@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "idt.h"
 #include "lock.h"
+#include "debug.h"
 
 struct gatedesc idt[256];
 extern uint_t intrs[];
@@ -50,7 +51,7 @@ void intr(struct trapframe *tf)
         acquire(&didalock);
         dida++;
         //wakeup(&dida);
-        printk("dida %08x\n", dida);
+        //printk("dida %08x\n", dida);
         release(&didalock);
         empty_int(tf->trapno);
         break;

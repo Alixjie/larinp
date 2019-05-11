@@ -5,6 +5,7 @@
 #include "mmu.h"
 #include "proc.h"
 #include "lock.h"
+#include "debug.h"
 
 void initlock(struct lock *lk, char *name)
 {

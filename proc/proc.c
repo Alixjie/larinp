@@ -7,6 +7,8 @@
 #include "lock.h"
 #include "debug.h"
 #include "vmm.h"
+#include "kalloc.h"
+#include "string.h"
 
 extern void forkret(void);
 extern void trapret(void);
@@ -23,7 +25,7 @@ static struct proc *initproc;
 
 int nextpid = 1;
 
-static void wkupauth(void *chan);
+//static void wkupauth(void *chan);
 
 // proctab 的锁初始化
 void ptabinit(void)
@@ -73,7 +75,7 @@ bingo:
         tmp->state = UNUSED;
         return FALSE;
     }
-    uchar_t *kesp = tmp->kstack + PGSIZE;
+    char_t *kesp = tmp->kstack + PGSIZE;
 
     // 内核栈指针向下偏移 trapframe 结构体个大小
     // 并将进程中断帧栈指针指向 kesp 处
@@ -103,8 +105,8 @@ void backtouser(void)
     struct proc *p = allocproc();
 
     initproc = p;
-    if ((p->pgdir = memalloc()) == FALSE)
-        printk("first process kmemalloc failure");
+    if ((p->pgdir = build_kvm()) == FALSE)
+        printk("first process build_kvm failure");
     firstuvm(p->pgdir, _binary_parasite_start, (uint_t)_binary_parasite_size);
     p->sz = PGSIZE;
     memset(p->tf, 0, sizeof(*p->tf));
@@ -181,3 +183,8 @@ void forkret(void)
     }
     // 返回到 trapframe 准备中断返回到用户态
 }
+
+// static void wkupauth(void *chan)
+// {
+
+// }
