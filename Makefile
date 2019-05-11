@@ -13,10 +13,10 @@ C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protect
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 
-all: $(S_OBJECTS) $(C_OBJECTS) link update_image 
+all: $(S_OBJECTS) $(C_OBJECTS) parasite link update_image 
 
-parasite: parasite.S
-	$(CC) $(CFLAGS) parasite.S
+parasite: drivers/parasite.S
+	$(CC) $(CFLAGS) drivers/parasite.S
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o parasite.out
 	$(OBJCOPY) -S -O binary parasite.out parasite
 

@@ -1,5 +1,5 @@
 #include "syscall.h"
-#include "traps.h"
+#include "idt.h"
 
 
 # 调用 exec(char *path, char **argv) 加载文件系统中的 init.c
