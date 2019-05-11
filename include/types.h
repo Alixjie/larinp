@@ -18,5 +18,6 @@ typedef unsigned char uchar_t;
 typedef char char_t;
 
 typedef uint_t pde_t;
+typedef uint_t pte_t;
 
 #endif

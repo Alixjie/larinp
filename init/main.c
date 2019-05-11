@@ -15,11 +15,14 @@ int main(void)
 {
     console_clear();
 
-    printk("Test printk funciton!\n");
-
     recyclemem(kern_end, P2V_P(4 * 1024 * 1024));
 
     dct_phy_mem();
+
+    build_kpgdir();
+    printk("kernel pgtab already changed!\n");
+
+    
 
     while (TRUE)
         ;

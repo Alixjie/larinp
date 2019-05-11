@@ -18,4 +18,6 @@ void init_timer(uint_t frequency)
 	// 分别写入低字节和高字节
 	outb(0x40, low);
 	outb(0x40, hign);
+
+	
 }
