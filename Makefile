@@ -2,7 +2,7 @@
 
 C_SOURCES = $(shell find . -name "*.c")
 C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
-S_SOURCES = $(shell find . -name "*.S" ! -path "./drivers/*")
+S_SOURCES = $(shell find . -name "*.S" ! -path "./parasite.S")
 S_OBJECTS = $(patsubst %.S, %.o, $(S_SOURCES))
 
 CC = gcc

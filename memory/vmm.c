@@ -150,11 +150,35 @@ void switchkvm(void)
 
 void firstuvm(pde_t *pgdir, uchar_t *init, uint_t sz)
 {
-  if (sz >= PGSIZE)
-    panic("firstuvm: first process must small than 4KB");
-  uchar_t *mem = memalloc();
-  memset(mem, 0, PGSIZE);
-  // 将用户空间 0 字节开始的 4K 页映射到申请的物理内存上（申请的物理内存是虚拟地址 需要做转化）
-  mapping(pgdir, 0, PGSIZE, V2P_P(mem), PTE_W | PTE_U);
-  memmove(mem, init, sz);
+    if (sz >= PGSIZE)
+        printk("firstuvm: first process must small than 4KB");
+    uchar_t *mem = memalloc();
+    memset(mem, 0, PGSIZE);
+    // 将用户空间 0 字节开始的 4K 页映射到申请的物理内存上（申请的物理内存是虚拟地址 需要做转化）
+    mapping(pgdir, 0, PGSIZE, V2P_P(mem), PTE_W | PTE_U);
+    memmove(mem, init, sz);
+}
+
+void changeuvm(struct proc *p)
+{
+    if (p == 0)
+        printk("no process\n");
+    if (p->kstack == 0)
+        printk("no kstack\n");
+    if (p->pgdir == 0)
+        printk("no pgdir\n");
+
+    pcli();
+    getcpu()->gdt[SEG_TSS] = SEG_T(STS_T32A, &getcpu()->ts, sizeof(getcpu()->ts) - 1, 0);
+    // 系统描述符
+    getcpu()->gdt[SEG_TSS].s = 0;
+    // 设置内核堆栈段和内核栈栈顶
+    getcpu()->ts.ss0 = SEG_KDATA << 3;
+    getcpu()->ts.esp0 = (uint_t)p->kstack + KSTACKSIZE;
+    
+    getcpu()->ts.iomb = (ushort_t)0xFFFF;
+    // 加载 tr 寄存器 设置进程页目录表
+    ltr(SEG_TSS << 3);
+    lcr3(V2P(p->pgdir));
+    vcli();
 }

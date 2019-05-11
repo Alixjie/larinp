@@ -147,7 +147,7 @@ void scheduler(void)
 
             // 找到状态为 RUMMABLE 的进程 切换到该进程内核上下文
             getcpu()->proc = p;
-            switchuvm(p);
+            changeuvm(p);
             p->state = RUNNING;
 
             swtch(&(getcpu()->scheduler), p->context);
