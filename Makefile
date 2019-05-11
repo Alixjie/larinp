@@ -8,6 +8,7 @@ S_OBJECTS = $(patsubst %.S, %.o, $(S_SOURCES))
 CC = gcc
 LD = ld 
 ASM = gas
+OBJCOPY = objcopy
 
 C_FLAGS = -c -Wall -m32 -ggdb -gstabs+ -nostdinc -fno-builtin -fno-stack-protector -no-pie -fno-pic -I include
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
@@ -15,9 +16,9 @@ ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 
 all: $(S_OBJECTS) $(C_OBJECTS) parasite link update_image 
 
-parasite: include/parasite.S
-	$(CC) $(CFLAGS) include/parasite.S
-	$(LD) -N -e start -Ttext 0 -o parasite.out
+parasite: parasite.S
+	$(CC) -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -Werror -fno-omit-frame-pointer -fno-stack-protector -fno-pie -no-pie -nostdinc -I include -c parasite.S
+	$(LD) -N -e start -Ttext 0 -m elf_i386 -nostdlib -o parasite.out parasite.o
 	$(OBJCOPY) -S -O binary parasite.out parasite
 
 .c.o:
@@ -34,7 +35,7 @@ link:
 
 .PHONY:clean 
 clean:
-	$(RM) $(S_OBJECTS) $(C_OBJECTS) jorny_kernel
+	$(RM) $(S_OBJECTS) $(C_OBJECTS) jorny_kernel parasite parasite.d parasite.o parasite.out
 
 .PHONY:update_image 
 update_image:

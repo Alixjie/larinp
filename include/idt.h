@@ -1,5 +1,3 @@
-#define IRQ_TIMER 0
-
 // 定义 IRQ
 #define IRQ_TIMER 32  // 电脑系统计时器
 #define IRQ_KEBD 33  // 键盘
@@ -11,6 +9,8 @@
 
 // 定义每秒钟的中断次数
 #define PERSECINTNUM 100
+
+#ifndef __ASSEMBLER__
 
 // 8253 初始化函数 frequency 表示每秒钟的终端次数
 void init_timer(uint_t frequency);
@@ -28,3 +28,5 @@ void idt_init(void);
 
 // 中断处理函数
 void intr(struct trapframe *tf);
+
+#endif
