@@ -8,6 +8,9 @@
 
 #define NUMOFELE(x) (sizeof(x) / sizeof((x)[0]))
 
+// 探测完后物理内存的最大值
+uint_t phy_end;
+
 // 初始化 GDT 表
 void gdt_init(void);
 

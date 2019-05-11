@@ -55,10 +55,12 @@ void dct_phy_mem(void)
     {
         if ((mmap->type == 1) && (mmap->base_addr_low == 0x100000))
         {
-            uint_t phy_end = (mmap->base_addr_low + mmap->length_low) & PHY_PAGE_MASK;
+            phy_end = (mmap->base_addr_low + mmap->length_low) & PHY_PAGE_MASK;
 
             if (phy_end < PHYSTOP)
                 kmap[2].phys_end = phy_end;
+            else
+                phy_end = PHYSTOP;
             break;
         }
     }

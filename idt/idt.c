@@ -36,11 +36,11 @@ void intr(struct trapframe *tf)
     if (tf->trapno == SYS_CALL)
     {
         if (getproc()->killed)
-      //      exit();
+            exit();
         getproc()->tf = tf;
-        //syscall();
+        syscall();
         if (getproc()->killed)
-          //  exit();
+            exit();
         return;
     }
 

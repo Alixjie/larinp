@@ -50,6 +50,12 @@ struct proc
     struct dentry *thisp; // 用于后续扩展缺页中断时加载 伟哥
 };
 
+// ptable 的锁初始化
+void ptabinit(void);
+
+// 得到 CPU
 struct cpu *getcpu(void);
 
+// 得到 CPU 当前运行进程
+// 有则返回进程指针 没有返回 NULL
 struct proc *getproc(void);

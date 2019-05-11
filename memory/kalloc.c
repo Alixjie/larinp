@@ -34,8 +34,12 @@ void recyclemem(void *vstart, void *vend)
 void dorecycle(void *vstart, void *vend)
 {
     char_t *p = (char *)PGROUNDUP((uint_t)vstart); // 取天棚
+
     for (; p + PGSIZE <= (char *)vend; p += PGSIZE)
         memfree(p);
+
+    // 测试回收了多少个 4K 页
+    printk("recycle 4K memory %d\n", (int_t)(((uint_t)p - (uint_t)vstart) / PGSIZE));
 }
 
 // 释放一个 4K 页

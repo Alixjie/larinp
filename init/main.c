@@ -26,7 +26,9 @@ int main(void)
 
     idt_init();
 
-    sti();
+    ptabinit();
+
+    dorecycle(P2V_P(4 * 1024 * 1024), P2V_P(phy_end));
 
     while (TRUE)
         ;
