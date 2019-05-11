@@ -68,13 +68,13 @@ struct segdesc
 #define STS_TG32 0xF // 陷阱门
 
 // 获取一个地址的页目录项
-#define PGD_INDEX(x) (((x) >> PGDSHIFT) & 0x3FF)
+#define PGD_INDEX(x) (((uint_t)(x) >> PGDSHIFT) & 0x3FF)
 
 // 获取一个地址的页表项
-#define PTE_INDEX(x) (((x) >> PTESHIFT) & 0x3FF)
+#define PTE_INDEX(x) (((uint_t)(x) >> PTESHIFT) & 0x3FF)
 
 // 获取一个地址的页內偏移
-#define OFFSET_INDEX(x) ((x)&0xFFF)
+#define OFFSET_INDEX(x) ((uint_t)(x)&0xFFF)
 
 // 根据索引和偏移量构造虚拟地址
 #define PGADDR(d, t, o) ((uint_t)((d) << PGDSHIFT | (t) << PTESHIFT | (o)))

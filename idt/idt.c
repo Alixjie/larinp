@@ -7,3 +7,6 @@
 //#include "traps.h"
 #include "lock.h"
 
+void
+intr(struct trapframe *tf)
+{}

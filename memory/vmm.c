@@ -62,7 +62,7 @@ void dct_phy_mem(void)
 static pte_t *find_pte(pde_t *pgdir, const void *va, int alloc)
 {
     pte_t *pte;
-    pde_t *pde = &pgdir[PDX(va)];
+    pde_t *pde = &pgdir[PGD_INDEX(va)];
     // 查看页表是否已经存在
     if (*pde & PTE_P)
         // 保存的是物理地址 需要转换为虚拟地址后使用（在使用临时页目录项时 没有错误）
@@ -79,7 +79,7 @@ static pte_t *find_pte(pde_t *pgdir, const void *va, int alloc)
         // 存在、可写、用户可访问
         *pde = V2P_P(pte) | PTE_P | PTE_W | PTE_U;
     }
-    return &pte[PTX(va)];
+    return &pte[PTE_INDEX(va)];
 }
 
 // 将从 VA（取地板）开始的虚拟地址映射到 PA 开始的物理地址 映射 size 大小 （向两边膨胀）
