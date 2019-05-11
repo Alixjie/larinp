@@ -50,7 +50,7 @@ struct proc
     struct dentry *thisp; // 用于后续扩展缺页中断时加载 伟哥
 };
 
-// ptable 的锁初始化
+// proctab 的锁初始化
 void ptabinit(void);
 
 // 得到 CPU
@@ -59,3 +59,9 @@ struct cpu *getcpu(void);
 // 得到 CPU 当前运行进程
 // 有则返回进程指针 没有返回 NULL
 struct proc *getproc(void);
+
+// 初始化第一个用户进程 返回到用户进程作准备
+void backtouser(void);
+
+// 内核态调度线程
+void scheduler(void);

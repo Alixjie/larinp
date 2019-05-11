@@ -30,6 +30,10 @@ int main(void)
 
     dorecycle(P2V_P(4 * 1024 * 1024), P2V_P(phy_end));
 
+    backtouser();
+
+    scheduler();
+
     while (TRUE)
         ;
 }
