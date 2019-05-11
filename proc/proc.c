@@ -23,20 +23,20 @@ int nextpid = 1;
 
 static void wkupauth(void *chan);
 
+// ptable 的锁初始化
 void ptabinit(void)
 {
     initlock(&ptable.lock, "proctab");
 }
 
-// Must be called with interrupts disabled to avoid the caller being
-// rescheduled between reading lapicid and running through the loop.
+// 得到当前 CPU 
 struct cpu* getcpu(void)
 {
     return &cpu0;
 }
 
-// Disable interrupts so that we are not rescheduled
-// while reading proc from the cpu structure
+// 得到当前 CPU 正在运行的进程
+// 有则得到进程的指针 没有返回 NULL
 struct proc* getproc(void)
 {
     pcli();

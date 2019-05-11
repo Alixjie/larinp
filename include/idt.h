@@ -1,19 +1,30 @@
+#define IRQ_TIMER 0
 
+// 定义 IRQ
+#define IRQ_TIMER 32  // 电脑系统计时器
+#define IRQ_KEBD 33  // 键盘
+#define IRQ_IDE0 46 // IDE0 传输控制使用
+#define IRQ_IDE1 47 // IDE1 传输控制使用
 
-// 定义IRQ
-#define IRQ0 32  // 电脑系统计时器
-#define IRQ1 33  // 键盘
-#define IRQ2 34  // 与 IRQ9 相接，MPU-401 MD 使用
-#define IRQ3 35  // 串口设备
-#define IRQ4 36  // 串口设备
-#define IRQ5 37  // 建议声卡使用
-#define IRQ6 38  // 软驱传输控制使用
-#define IRQ7 39  // 打印机传输控制使用
-#define IRQ8 40  // 即时时钟
-#define IRQ9 41  // 与 IRQ2 相接，可设定给其他硬件
-#define IRQ10 42 // 建议网卡使用
-#define IRQ11 43 // 建议 AGP 显卡使用
-#define IRQ12 44 // 接 PS/2 鼠标，也可设定给其他硬件
-#define IRQ13 45 // 协处理器使用
-#define IRQ14 46 // IDE0 传输控制使用
-#define IRQ15 47 // IDE1 传输控制使用
+// 定义 0x80
+#define SYS_CALL 0x80
+
+// 定义每秒钟的中断次数
+#define PERSECINTNUM 100
+
+// 8253 初始化函数 frequency 表示每秒钟的终端次数
+void init_timer(uint_t frequency);
+
+// 8259A 的相关函数
+// 初始化 8259A
+void init_8259A(void);
+
+// IRQ 中断完成后清空标志位
+void empty_int(int trapno);
+
+// idt 的相关函数
+// idt 初始化
+void idt_init(void);
+
+// 中断处理函数
+void intr(struct trapframe *tf);

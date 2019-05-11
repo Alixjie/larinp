@@ -8,6 +8,9 @@
 
 #define NUMOFELE(x) (sizeof(x) / sizeof((x)[0]))
 
+// 初始化 GDT 表
+void gdt_init(void);
+
 // 探测物理内存最大值 刷新kmap
 void dct_phy_mem(void);
 

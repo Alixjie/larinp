@@ -1,6 +1,6 @@
 #include "x86.h"
 
-init_8259A()
+void init_8259A(void)
 {
     // 初始化两片级联的 Intel 8259A 芯片
 

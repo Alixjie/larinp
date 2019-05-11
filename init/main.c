@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "kalloc.h"
 #include "vmm.h"
+#include "idt.h"
 
 // kernel.ld链接脚本中定义 内核结束的内存物理地址
 extern char kern_end[];
@@ -20,9 +21,10 @@ int main(void)
     dct_phy_mem();
 
     build_kpgdir();
-    printk("kernel pgtab already changed!\n");
 
-    
+    gdt_init();
+
+    idt_init();
 
     while (TRUE)
         ;
