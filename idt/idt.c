@@ -9,7 +9,7 @@
 
 struct gatedesc idt[256];
 extern uint_t intrs[];
-struct spinlock didalock;
+struct lock didalock;
 uint_t dida;
 
 void idt_init(void)
@@ -36,11 +36,11 @@ void intr(struct trapframe *tf)
     if (tf->trapno == SYS_CALL)
     {
         if (getproc()->killed)
-            exit();
+      //      exit();
         getproc()->tf = tf;
-        syscall();
+        //syscall();
         if (getproc()->killed)
-            exit();
+          //  exit();
         return;
     }
 

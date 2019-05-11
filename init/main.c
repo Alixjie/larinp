@@ -26,6 +26,8 @@ int main(void)
 
     idt_init();
 
+    sti();
+
     while (TRUE)
         ;
 }
