@@ -2,7 +2,7 @@
 
 C_SOURCES = $(shell find . -name "*.c")
 C_OBJECTS = $(patsubst %.c, %.o, $(C_SOURCES))
-S_SOURCES = $(shell find . -path ./drivers -prune -o -name "*.S")
+S_SOURCES = $(shell find . -name "*.S" ! -path "./drivers/*")
 S_OBJECTS = $(patsubst %.S, %.o, $(S_SOURCES))
 
 CC = gcc
@@ -16,7 +16,7 @@ ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 all: $(S_OBJECTS) $(C_OBJECTS) link update_image 
 
 parasite: parasite.S
-	$(CC) $(CFLAGS) -nostdinc -I. -c parasite.S
+	$(CC) $(CFLAGS) parasite.S
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o parasite.out
 	$(OBJCOPY) -S -O binary parasite.out parasite
 

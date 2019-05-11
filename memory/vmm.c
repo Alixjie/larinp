@@ -155,6 +155,6 @@ void firstuvm(pde_t *pgdir, uchar_t *init, uint_t sz)
   uchar_t *mem = memalloc();
   memset(mem, 0, PGSIZE);
   // 将用户空间 0 字节开始的 4K 页映射到申请的物理内存上（申请的物理内存是虚拟地址 需要做转化）
-  mappages(pgdir, 0, PGSIZE, V2P_P(mem), PTE_W | PTE_U);
+  mapping(pgdir, 0, PGSIZE, V2P_P(mem), PTE_W | PTE_U);
   memmove(mem, init, sz);
 }
