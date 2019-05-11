@@ -71,7 +71,7 @@ static pte_t *find_pte(pde_t *pgdir, const void *va, int alloc)
     // 没有对应页表 根据alloc的值决定是否新建页目录项即页表
     else
     {
-        if ((!alloc) || ((pte = (pte_t *)kalloc()) == NULL))
+        if ((!alloc) || ((pte = (pte_t *)memalloc()) == NULL))
             return 0;
         // 回收内存时页已被写满 1 清空该段内存
         memset(pte, 0, PGSIZE);
@@ -93,7 +93,7 @@ static int mapping(pde_t *pgdir, void *va, uint_t size, uint_t pa, int perm)
     while (TRUE)
     {
         pte_t *pte = find_pte(pgdir, vadown, 1);
-        if (pte)
+        if (pte == NULL)
             return -1;
         if (*pte & PTE_P)
             printk("pte alread exist\n");
