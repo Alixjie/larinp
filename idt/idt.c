@@ -56,7 +56,7 @@ void intr(struct trapframe *tf)
         // 唤醒全部睡在 dida 上的进程 若时间到则 继续执行 没还没到时间 继续 sleep
         wakeup(&dida);
         // 测试是否进入了时钟中断
-        // printk("dida %08x\n", dida);
+        printk("dida %08x\n", dida);
         release(&didalock);
         empty_int(tf->trapno);
         break;

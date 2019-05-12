@@ -245,6 +245,8 @@ int fork(void)
 
     int_t childpid = child->pid;
 
+    printk("child pid %d", childpid);
+
     acquire(&proctab.lock);
 
     child->state = RUNNABLE;
@@ -379,9 +381,9 @@ void timetosleep(void)
     acquire(&proctab.lock);
     getproc()->state = RUNNABLE;
     // 测试
-    printk("time solt is over!\n");
+    printk("time solt is over! %d\n", getproc()->pid);
     sched();
-    printk("reget time solt\n");
+    printk("reget time solt! %d\n", getproc()->pid);
     release(&proctab.lock);
 }
 

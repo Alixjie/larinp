@@ -12,7 +12,12 @@ start:
 # movl $SYS_exec, %eax
 # int $SYS_CALL
 # 死循环测试时钟中断
-  jmp start
+    pushl $0
+    movl $SYS_fork, %eax
+    int $SYS_CALL
+
+stop:
+    jmp stop
 
 # for(;;) exit();
 exit:
