@@ -1,3 +1,5 @@
+#include "lock.h"
+
 struct cpu
 {
     struct context *scheduler;   // 保存内核调度器线程上下文
@@ -99,9 +101,6 @@ void timetosleep(void);
 // 自动释放现在带有的锁 并睡眠在 chan 上 当再次唤醒时会重新获得丢失的锁
 // 在申请它的地方释放
 void sleep(void *chan, struct lock *lk);
-
-// 做出真正的唤醒操作（此时应该已经获得了 proctab 的锁 或本来就有）
-static void wkupauth(void *chan);
 
 // 得到进程表锁
 // 调用真正唤醒的函数 wkupauth(chan)

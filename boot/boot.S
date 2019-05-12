@@ -40,9 +40,8 @@ entry:
   mov $main, %eax
   jmp *%eax
 
-.bss
-glb_mboot_ptr:
-    .skip 4
+.comm glb_mboot_ptr, 4
 
+.bss
     .skip KSTACKSIZE
 stack:

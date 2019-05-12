@@ -2,6 +2,10 @@
 #include "param.h"
 #include "mmu.h"
 #include "proc.h"
+#include "idt.h"
+#include "vmm.h"
+#include "string.h"
+
 
 int sys_exec(void)
 {
@@ -16,7 +20,7 @@ int sys_exec(void)
   memset(argv, 0, sizeof(argv));
   for (i = 0;; i++)
   {
-    if (i >= NELEM(argv))
+    if (i >= NUMOFELE(argv))
       return -1;
     if (fetchint(uargv + 4 * i, (int *)&uarg) < 0)
       return -1;
@@ -28,5 +32,6 @@ int sys_exec(void)
     if (fetchstr(uarg, &argv[i]) < 0)
       return -1;
   }
-  return exec(path, argv);
+  //return exec(path, argv);
+  return 1;
 }

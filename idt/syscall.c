@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "syscall.h"
 #include "debug.h"
+#include "vmm.h"
 
 extern int sys_chdir(void);
 extern int sys_close(void);
@@ -106,25 +107,25 @@ static int (*syscalls[])(void) = {
     [SYS_fork] sys_fork,
     [SYS_exit] sys_exit,
     [SYS_wait] sys_wait,
-    [SYS_pipe] sys_pipe,
-    [SYS_read] sys_read,
+    //[SYS_pipe] sys_pipe,
+    //[SYS_read] sys_read,
     [SYS_kill] sys_kill,
     [SYS_exec] sys_exec,
-    [SYS_fstat] sys_fstat,
-    [SYS_chdir] sys_chdir,
-    [SYS_dup] sys_dup,
+    //[SYS_fstat] sys_fstat,
+    //[SYS_chdir] sys_chdir,
+    //[SYS_dup] sys_dup,
     [SYS_getpid] sys_getpid,
     [SYS_sbrk] sys_sbrk,
     [SYS_sleep] sys_sleep,
     [SYS_uptime] sys_uptime,
-    [SYS_open] sys_open,
-    [SYS_write] sys_write,
-    [SYS_mknod] sys_mknod,
-    [SYS_unlink] sys_unlink,
-    [SYS_link] sys_link,
-    [SYS_mkdir] sys_mkdir,
-    [SYS_close] sys_close,
-    [SYS_prioty] sys_prioty,
+    // [SYS_open] sys_open,
+    // [SYS_write] sys_write,
+    // [SYS_mknod] sys_mknod,
+    // [SYS_unlink] sys_unlink,
+    // [SYS_link] sys_link,
+    // [SYS_mkdir] sys_mkdir,
+    // [SYS_close] sys_close,
+    // [SYS_prioty] sys_prioty,
 };
 
 void syscall(void)
@@ -135,7 +136,7 @@ void syscall(void)
   printk("I am in system call!\n");
 
   int callnum = curproc->tf->eax;
-  if (callnum > 0 && callnum < NELEM(syscalls) && syscalls[callnum])
+  if (callnum > 0 && callnum < NUMOFELE(syscalls) && syscalls[callnum])
     // 得到返回值（正数）
     curproc->tf->eax = syscalls[callnum]();
   else

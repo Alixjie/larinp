@@ -239,7 +239,7 @@ int fork(void)
     for (int i = 0; i < NOFILE; i++)
         if (curproc->ofile[i])
            // child->ofile[i] = filedup(curproc->ofile[i]); 伟哥
-    child->cwd = idup(curproc->cwd);
+    //child->cwd = idup(curproc->cwd);
 
     safestrcpy(child->name, curproc->name, sizeof(curproc->name));
 
@@ -258,6 +258,8 @@ int fork(void)
 // 本函数执行后正常情况下不会返回 若执行最后一句则出错
 void exit(void)
 {
+    // 测试
+    printk("I am in exit\n");
     struct proc *curproc = getproc();
 
     if (curproc == initproc)
@@ -323,9 +325,9 @@ int wait(void)
             {
                 // 找到符合要求的“僵尸”孩子
                 int childpid = p->pid;
-                kfree(p->kstack);
+                memfree(p->kstack);
                 p->kstack = 0;
-                freevm(p->pgdir);
+                clearpgd(p->pgdir);
                 p->pid = 0;
                 p->name[0] = 0;
                 p->parent = NULL;

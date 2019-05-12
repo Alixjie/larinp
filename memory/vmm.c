@@ -290,7 +290,7 @@ pde_t *copyuvm(pde_t *pgdir, uint_t sz)
         if ((pte = find_pte(pgdir, (void *)i, 0)) == 0)
             printk("copyuvm: page table not exist");
         if (!(*pte & PTE_P))
-            panic("copyuvm: page not exist");
+            printk("copyuvm: page not exist\n");
         // 得到映射页的物理地址
         uint_t pa = PTE_ADDR(*pte);
         // 得到属性
@@ -309,6 +309,6 @@ pde_t *copyuvm(pde_t *pgdir, uint_t sz)
     return tmpd;
 
 oyoq:
-    freevm(tmpd);
+    clearpgd(tmpd);
     return FALSE;
 }

@@ -32,4 +32,30 @@ void intr(struct trapframe *tf);
 // 系统调用总入口函数（通过函数指针数组跳转到不同的系统函数）
 void syscall(void);
 
+
+
+
+
+int fetchint(uint_t addr, int *ip);
+
+// Fetch the nul-terminated string at addr from the current process.
+// Doesn't actually copy the string - just sets *pp to point at it.
+// Returns length of string, not including nul.
+int fetchstr(uint_t addr, char **pp);
+
+// Fetch the nth 32-bit system call argument.
+int argint(int n, int *ip);
+
+// Fetch the nth word-sized system call argument as a pointer
+// to a block of memory of size bytes.  Check that the pointer
+// lies within the process address space.
+int argptr(int n, char **pp, int size);
+
+// Fetch the nth word-sized system call argument as a string pointer.
+// Check that the pointer is valid and the string is nul-terminated.
+// (There is no shared writable memory, so the string can't change
+// between this check and being used by the kernel.)
+int argstr(int n, char **pp);
+
+
 #endif
