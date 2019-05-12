@@ -29,4 +29,7 @@ void idt_init(void);
 // 中断处理函数
 void intr(struct trapframe *tf);
 
+// 系统调用总入口函数（通过函数指针数组跳转到不同的系统函数）
+void syscall(void);
+
 #endif

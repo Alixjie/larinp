@@ -130,7 +130,7 @@ pde_t *build_kvm(void)
     for (struct kmap *k = kmap; k < &kmap[NUMOFELE(kmap)]; ++k)
         if (mapping(pgdir, k->virt, k->phys_end - k->phys_start, (uint_t)k->phys_start, k->perm) < 0)
         {
-            memfree((char_t *)pgdir);
+            clearpgd(pgdir);
             return FALSE;
         }
     return pgdir;
@@ -152,7 +152,7 @@ void switchkvm(void)
 void firstuvm(pde_t *pgdir, char_t *init, uint_t sz)
 {
     if (sz >= PGSIZE)
-        printk("firstuvm: first process must small than 4KB");
+        printk("first process must small than 4KB");
     char_t *mem = memalloc();
     memset(mem, 0, PGSIZE);
     // 将用户空间 0 字节开始的 4K 页映射到申请的物理内存上（申请的物理内存是虚拟地址 需要做转化）
@@ -176,10 +176,139 @@ void changeuvm(struct proc *p)
     // 设置内核堆栈段和内核栈栈顶
     getcpu()->ts.ss0 = SEG_KDATA << 3;
     getcpu()->ts.esp0 = (uint_t)p->kstack + KSTACKSIZE;
-    
+
     getcpu()->ts.iomb = (ushort_t)0xFFFF;
     // 加载 tr 寄存器 设置进程页目录表
     ltr(SEG_TSS << 3);
     lcr3(V2P_P(p->pgdir));
     vcli();
+}
+
+// 将进程的用户态虚拟内存从 oldsize -> newsize（增加）
+// 但 newsize 可以小于 oldsize 这种情况不需要调用该函数 直接返回
+int gvusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz)
+{
+    if (newsz >= KERNBASE)
+        return FALSE;
+    if (newsz < oldsz)
+        return oldsz;
+
+    uint_t tmp = PGROUNDUP(oldsz);
+    for (; tmp < newsz; tmp += PGSIZE)
+    {
+        char *tmpk = memalloc();
+        if (tmpk == FALSE)
+        {
+            printk("there have no more memory\n");
+            // 本函数调用失败内存空间恢复到原来的状态
+            cfcusrmem(pgdir, newsz, oldsz);
+            return FALSE;
+        }
+        memset(kmap, 0, PGSIZE);
+        if (mapping(pgdir, (char *)tmp, PGSIZE, V2P_P(tmpk), PTE_W | PTE_U) < 0)
+        {
+            printk("mapping faliure\n");
+            // 本函数调用失败内存空间恢复到原来的状态
+            cfcusrmem(pgdir, newsz, oldsz);
+            memfree(tmpk);
+            return FALSE;
+        }
+    }
+    return newsz;
+}
+
+// 将进程的用户态虚拟内存从 oldsize -> newsize（减少）
+// 但 newsize 可以大于 oldsize 这种情况不需要调用该函数 直接返回
+int cfcusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz)
+{
+    if (newsz >= oldsz)
+        return oldsz;
+
+    uint_t tmp = PGROUNDUP(newsz);
+    for (; tmp < oldsz; tmp += PGSIZE)
+    {
+        pte_t *tmpte = find_pte(pgdir, (char *)tmp, 0);
+        if (!tmpte)
+            // 对应的页目录项为空 既不存在该页表
+            tmp = PGADDR(PGD_INDEX(tmp) + 1, 0, 0) - PGSIZE;
+
+        // 对应页表项不为空 且存在位为 1 既存在该页
+        else if ((*tmpte & PTE_P) != 0)
+        {
+            // 获得该页的物理地址
+            uint_t adr = PTE_ADDR(*tmpte);
+            if (adr == 0)
+                printk("zore allways not use\n");
+            // 转化为虚拟地址释放
+            char *v = P2V_P(adr);
+            memfree(v);
+            *tmpte = 0;
+        }
+    }
+    return newsz;
+}
+
+// 清空用户态申请的所有内存 并释放内核态映射的页目录项 即页表
+void clearpgd(pde_t *pgdir)
+{
+    if (pgdir == NULL)
+        printk("no pgdir\n");
+    cfcusrmem(pgdir, KERNBASE, 0);
+    for (int i = 0; i < NPDENTRIES; ++i)
+    {
+        if (pgdir[i] & PTE_P)
+        {
+            // 回收页目录项 即回收页表
+            char *v = P2V_P(PTE_ADDR(pgdir[i]));
+            memfree(v);
+        }
+    }
+    // 回收最后的页目录
+    memfree((char *)pgdir);
+}
+
+// 在用户栈和数据区之间设置一页用户访问不了的页
+// 防止意外删除数据区数据 且会发生页保护中断
+void setusrcnt(pde_t *pgdir, char *uva)
+{
+    pte_t *pte = find_pte(pgdir, uva, 0);
+    if (pte == 0)
+        printk("setusrcnt\n");
+    *pte &= ~PTE_U;
+}
+
+// 当调用 fork() 函数时 创建内核映射 并复制用户态数据
+pde_t *copyuvm(pde_t *pgdir, uint_t sz)
+{
+    pde_t *tmpd;
+
+    if ((tmpd = build_kvm()) == FALSE)
+        return FALSE;
+    for (int i = 0; i < sz; i += PGSIZE)
+    {
+        pte_t *pte;
+        if ((pte = find_pte(pgdir, (void *)i, 0)) == 0)
+            printk("copyuvm: page table not exist");
+        if (!(*pte & PTE_P))
+            panic("copyuvm: page not exist");
+        // 得到映射页的物理地址
+        uint_t pa = PTE_ADDR(*pte);
+        // 得到属性
+        uint_t flags = PTE_FLAGS(*pte);
+        char_t *rec;
+        if ((rec = memalloc()) == 0)
+            goto oyoq;
+        // 复制内存页数据
+        memmove(rec, (char *)P2V_P(pa), PGSIZE);
+        if (mapping(tmpd, (void *)i, PGSIZE, V2P_P(rec), flags) < 0)
+        {
+            memfree(rec);
+            goto oyoq;
+        }
+    }
+    return tmpd;
+
+oyoq:
+    freevm(tmpd);
+    return FALSE;
 }

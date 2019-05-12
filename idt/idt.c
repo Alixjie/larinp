@@ -36,12 +36,15 @@ void intr(struct trapframe *tf)
     // 系统调用接口 int 0x80
     if (tf->trapno == SYS_CALL)
     {
+        // 当进程被杀死时 在这里调用 exit() 函数
         if (getproc()->killed)
-           // exit();
+            exit();
         getproc()->tf = tf;
-        //syscall();
+        syscall();
+        // 查看是否调用了 kill 之类的系统调用
+        // 一旦 kill != 0 尽早的释放它的资源
         if (getproc()->killed)
-          //  exit();
+            exit();
         return;
     }
 
@@ -50,8 +53,10 @@ void intr(struct trapframe *tf)
     case IRQ_TIMER:
         acquire(&didalock);
         dida++;
-        //wakeup(&dida);
-        //printk("dida %08x\n", dida);
+        // 唤醒全部睡在 dida 上的进程 若时间到则 继续执行 没还没到时间 继续 sleep
+        wakeup(&dida);
+        // 测试是否进入了时钟中断
+        // printk("dida %08x\n", dida);
         release(&didalock);
         empty_int(tf->trapno);
         break;
@@ -65,7 +70,20 @@ void intr(struct trapframe *tf)
         }
         // 用户态发生异常中断 杀死该进程
         printk("pid %d %s: trap %d err %d eip 0x%x addr 0x%x--kill proc\n",
-                getproc()->pid, getproc()->name, tf->trapno, tf->err, tf->eip, rcr2());
+               getproc()->pid, getproc()->name, tf->trapno, tf->err, tf->eip, rcr2());
         getproc()->killed = 1;
     }
+
+    // 当进程被杀死时 在这里调用 exit() 函数
+    if (getproc() && getproc()->killed && (tf->cs & 3) == DPL_USER)
+        exit();
+
+    // 进程时间片已经耗尽 改状态为 RUNNABLE 调度下一个可运行进程
+    if (getproc() && getproc()->state == RUNNING && tf->trapno == IRQ_TIMER)
+        timetosleep();
+
+    // 看调度其他进程运行时是否杀死了本进程
+    // 当进程被杀死时 在这里调用 exit() 函数
+    if (getproc() && getproc()->killed && (tf->cs & 3) == DPL_USER)
+        exit();
 }

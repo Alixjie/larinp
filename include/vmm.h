@@ -29,6 +29,30 @@ void firstuvm(pde_t *pgdir, char_t *init, uint_t sz);
 // 恢复进程的有些属性（主要是 TSS ）
 void changeuvm(struct proc *p);
 
+// 切换到内核线程（切换到只有内核映射页目录）
 void switchkvm(void);
+
+// 初始化第一个进程的用户态空间
+void firstuvm(pde_t *pgdir, char_t *init, uint_t sz);
+
+void changeuvm(struct proc *p);
+
+// 将进程的用户态虚拟内存从 oldsize -> newsize（增加）
+// 但 newsize 可以小于 oldsize 这种情况不需要调用该函数 直接返回
+int gvusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz);
+
+// 将进程的用户态虚拟内存从 oldsize -> newsize（减少）
+// 但 newsize 可以大于 oldsize 这种情况不需要调用该函数 直接返回
+int cfcusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz);
+
+// 清空用户态申请的所有内存 并释放内核态映射的页目录项 即页表
+void clearpgd(pde_t *pgdir);
+
+// 在用户栈和数据区之间设置一页用户访问不了的页 
+// 防止意外删除数据区数据 且会发生页保护中断
+void setusrcnt(pde_t *pgdir, char *uva);
+
+// 当调用 fork() 函数时 创建内核映射 并复制用户态数据
+pde_t *copyuvm(pde_t *pgdir, uint_t sz);
 
 #endif

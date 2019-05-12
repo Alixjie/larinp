@@ -18,7 +18,7 @@ S_FLAGS = -I include -m32 -gdwarf-2 -Wa,-divide   -c
 LD_FLAGS = -T scripts/kernel.ld -m elf_i386 -nostdlib
 ASM_FLAGS = -m32 -gdwarf-2 -Wa,-divide
 
-all: $(S_OBJECTS) $(C_OBJECTS) parasite bot link update_image 
+all: $(S_OBJECTS) $(C_OBJECTS) parasite booot link update_image 
 
 parasite: parasite.S
 	$(CC) $(C_FLAGS) parasite.S
@@ -26,7 +26,7 @@ parasite: parasite.S
 	$(OBJCOPY) -S -O binary parasite.out parasite
 	$(OBJDUMP) -S parasite.o > parasite.asm
 
-bot: boot/boot.S
+booot: boot/boot.S
 	$(CC) $(S_FLAGS) boot/boot.S -o boot/boot.o
 
 .c.o:
