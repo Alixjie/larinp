@@ -5,12 +5,14 @@
 # 调用 exec(char *path, char **argv) 加载文件系统中的 init.c
 .globl start
 start:
-  pushl $argv
-  pushl $init
-  # 模拟函数调用压入返回地址
-  pushl $0  
-  movl $SYS_exec, %eax
-  int $SYS_CALL
+  ; pushl $argv
+  ; pushl $init
+  ; # 模拟函数调用压入返回地址
+  ; pushl $0  
+  ; movl $SYS_exec, %eax
+  ; int $SYS_CALL
+  ; 死循环测试时钟中断
+  jmp start
 
 # for(;;) exit();
 exit:

@@ -131,6 +131,9 @@ void syscall(void)
 {
   struct proc *curproc = getproc();
 
+  // 测试
+  printk("I am in system call!\n");
+
   int callnum = curproc->tf->eax;
   if (callnum > 0 && callnum < NELEM(syscalls) && syscalls[callnum])
     // 得到返回值（正数）

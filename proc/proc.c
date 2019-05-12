@@ -376,7 +376,10 @@ void timetosleep(void)
 {
     acquire(&proctab.lock);
     getproc()->state = RUNNABLE;
+    // 测试
+    printk("time solt is over!\n");
     sched();
+    printk("reget time solt\n");
     release(&proctab.lock);
 }
 
