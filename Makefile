@@ -24,10 +24,10 @@ parasite: parasite.S
 	$(CC) $(C_FLAGS) parasite.S
 	$(LD) -N -e start -Ttext 0 -m elf_i386 -nostdlib -o parasite.out parasite.o
 	$(OBJCOPY) -S -O binary parasite.out parasite
-	# $(OBJDUMP) -S parasite.o > parasite.asm
+	$(OBJDUMP) -S parasite.o > parasite.asm
 
 boot: boot/boot.S
-	$(CC) $(S_FLAGS) $< -o $@
+	$(CC) $(S_FLAGS) boot/boot.S -o boot/boot.o
 
 .c.o:
 	@echo 编译代码文件 $< ...
@@ -40,10 +40,11 @@ boot: boot/boot.S
 link:
 	@echo 链接内核文件...
 	$(LD) $(LD_FLAGS) -o jorny_kernel boot/boot.o $(S_OBJECTS) $(C_OBJECTS) -b binary parasite
+	$(OBJDUMP) -S jorny_kernel >jorny_kernel.asm
 
 .PHONY:clean 
 clean:
-	$(RM) $(C_BIBID) $(S_OBJECTS) $(C_OBJECTS) jorny_kernel parasite parasite.o parasite.out boot/boot.o
+	$(RM) $(C_BIBID) $(S_OBJECTS) $(C_OBJECTS) jorny_kernel* parasite parasite.o parasite.out boot/boot.o parasite.d
 
 .PHONY:update_image 
 update_image:
