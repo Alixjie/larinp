@@ -18,7 +18,10 @@ int sys_fork(void)
 int sys_exit(void)
 {
   exit();
-  return 0; // not reached
+
+  // 若没出错 不会执行到这里
+  // exit() 最后调用 sched() 切换进程 父进程将会把剩下占中的资源释放
+  return 0;
 }
 
 int sys_wait(void)
@@ -42,48 +45,45 @@ int sys_getpid(void)
 
 int sys_sbrk(void)
 {
-  int addr;
-  int n;
+  int_t para;
 
-  if (argint(0, &n) < 0)
+  if (argint(0, &para) < 0)
     return -1;
-  addr = getproc()->sz;
-  if (growproc(n) < 0)
+  int_t addr = getproc()->sz;
+  if (growproc(para) < 0)
     return -1;
+  // 返回改变前的进程大小（程序用户态可用的最大地址）
   return addr;
 }
 
 int sys_sleep(void)
 {
-  int n;
-  uint_t ticks0;
+  int para;
 
-  if (argint(0, &n) < 0)
+  if (argint(0, &para) < 0)
     return -1;
   acquire(&didalock);
-  ticks0 = dida;
-  while (dida - ticks0 < n)
+  uint_t rec = dida;
+  while (dida - rec < para)
   {
+    // 进程在休眠期间被杀死 释放锁 返回
     if (getproc()->killed)
     {
       release(&didalock);
       return -1;
     }
+    // 继续睡眠 直到时间到来
     sleep(&dida, &didalock);
   }
   release(&didalock);
   return 0;
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
+// 开机到现在的系统 dida 数
 int sys_uptime(void)
 {
-  uint_t xticks;
-
   acquire(&didalock);
-  xticks = dida;
+  uint_t setupdida = dida;
   release(&didalock);
-  return xticks;
-  return 0;
+  return setupdida;
 }

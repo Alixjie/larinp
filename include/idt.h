@@ -1,8 +1,8 @@
 // 定义 IRQ
-#define IRQ_TIMER 32  // 电脑系统计时器
+#define IRQ_TIMER 32 // 电脑系统计时器
 #define IRQ_KEBD 33  // 键盘
-#define IRQ_IDE0 46 // IDE0 传输控制使用
-#define IRQ_IDE1 47 // IDE1 传输控制使用
+#define IRQ_IDE0 46  // IDE0 传输控制使用
+#define IRQ_IDE1 47  // IDE1 传输控制使用
 
 // 定义 0x80
 #define SYS_CALL 0x80
@@ -32,30 +32,20 @@ void intr(struct trapframe *tf);
 // 系统调用总入口函数（通过函数指针数组跳转到不同的系统函数）
 void syscall(void);
 
+// 得到当前进程给定地址处的 int 型参数
+int fetchint(uint_t addr, int *arg);
 
+// 将 addr 的值强转为 char * 赋值给 *parg 
+// 检查用户参数是否越界（用户代码不可信）并返回字符串长度
+int fetchstr(uint_t addr, char **parg);
 
+// 获取第 n 个 32 位 int 型系统调用参数
+int argint(int n, int *arg);
 
+// 获得第 n 个 char * 类型的系统调用参数
+int argstr(int n, char **parg);
 
-int fetchint(uint_t addr, int *ip);
-
-// Fetch the nul-terminated string at addr from the current process.
-// Doesn't actually copy the string - just sets *pp to point at it.
-// Returns length of string, not including nul.
-int fetchstr(uint_t addr, char **pp);
-
-// Fetch the nth 32-bit system call argument.
-int argint(int n, int *ip);
-
-// Fetch the nth word-sized system call argument as a pointer
-// to a block of memory of size bytes.  Check that the pointer
-// lies within the process address space.
-int argptr(int n, char **pp, int size);
-
-// Fetch the nth word-sized system call argument as a string pointer.
-// Check that the pointer is valid and the string is nul-terminated.
-// (There is no shared writable memory, so the string can't change
-// between this check and being used by the kernel.)
-int argstr(int n, char **pp);
-
+// 从文件系统加载进程
+int exec(char *path, char **argv);
 
 #endif

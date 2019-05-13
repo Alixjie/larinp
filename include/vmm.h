@@ -35,8 +35,6 @@ void switchkvm(void);
 // 初始化第一个进程的用户态空间
 void firstuvm(pde_t *pgdir, char_t *init, uint_t sz);
 
-void changeuvm(struct proc *p);
-
 // 将进程的用户态虚拟内存从 oldsize -> newsize（增加）
 // 但 newsize 可以小于 oldsize 这种情况不需要调用该函数 直接返回
 int gvusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz);
@@ -48,11 +46,21 @@ int cfcusrmem(pde_t *pgdir, uint_t oldsz, uint_t newsz);
 // 清空用户态申请的所有内存 并释放内核态映射的页目录项 即页表
 void clearpgd(pde_t *pgdir);
 
-// 在用户栈和数据区之间设置一页用户访问不了的页 
+// 在用户栈和数据区之间设置一页用户访问不了的页
 // 防止意外删除数据区数据 且会发生页保护中断
 void setusrcnt(pde_t *pgdir, char *uva);
 
 // 当调用 fork() 函数时 创建内核映射 并复制用户态数据
 pde_t *copyuvm(pde_t *pgdir, uint_t sz);
+
+// 加载程序段到指定内存
+int ldfromhd(pde_t *pgdir, char *addr, struct inode *ip, uint_t offset, uint_t sz);
+
+// 得到 uva 物理地址对应的虚拟内核地址
+char *uva2ka(pde_t *pgdir, char *uva);
+
+// 将 p 开始 len 长度的字节拷贝到 va
+// 但是是通过 va 转换成内核的 ka 后复制
+int copyout(pde_t *pgdir, uint_t va, void *p, uint_t len);
 
 #endif

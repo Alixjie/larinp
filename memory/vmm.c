@@ -312,3 +312,61 @@ oyoq:
     clearpgd(tmpd);
     return FALSE;
 }
+
+// 加载程序段到指定内存
+int ldfromhd(pde_t *pgdir, char *addr, struct inode *ip, uint_t offset, uint_t sz)
+{
+    pte_t *pte;
+
+    if ((uint_t)addr % PGSIZE != 0)
+        printk("loaduvm: addr must be page aligned");
+    for (uint_t i = 0; i < sz; i += PGSIZE)
+    {
+        if ((pte = find_pte(pgdir, addr + i, 0)) == 0)
+            printk("loaduvm: address should exist");
+        uint_t pa = PTE_ADDR(*pte);
+
+        uint_t n;
+        if (sz - i < PGSIZE)
+            n = sz - i;
+        else
+            n = PGSIZE;
+        if (readi(ip, P2V_P(pa), offset + i, n) != n)
+            return -1;
+    }
+    return 0;
+}
+
+// 得到 uva 物理地址对应的虚拟内核地址
+char *uva2ka(pde_t *pgdir, char *uva)
+{
+    pte_t *pte = find_pte(pgdir, uva, 0);
+    if ((*pte & PTE_P) == 0)
+        return FALSE;
+    if ((*pte & PTE_U) == 0)
+        return FALSE;
+    return (char *)P2V_P(PTE_ADDR(*pte));
+}
+
+// 将 p 开始 len 长度的字节拷贝到 va
+// 但是是通过 va 转换成内核的 ka 后复制
+int copyout(pde_t *pgdir, uint_t va, void *p, uint_t len)
+{
+    char *rec = (char *)p;
+    while (len > 0)
+    {
+        uint_t vadown = (uint_t)PGROUNDDOWN(va);
+        char *ka = uva2ka(pgdir, (char *)vadown);
+        if (ka == 0)
+            return -1;
+        uint_t n = PGSIZE - (va - vadown);
+        // 在该页中就够存了
+        if (n > len)
+            n = len;
+        memmove(ka + (va - vadown), rec, n);
+        len -= n;
+        rec += n;
+        va = vadown + PGSIZE;
+    }
+    return 0;
+}

@@ -31,75 +31,53 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_prioty(void);
 
-// User code makes a system call with INT T_SYSCALL.
-// System call number in %eax.
-// Arguments on the stack, from the user call to the C
-// library system call function. The saved user %esp points
-// to a saved program counter, and then the first argument.
-
-// Fetch the int at addr from the current process.
-int fetchint(uint_t addr, int *ip)
+// 得到当前进程给定地址处的 int 型参数
+int fetchint(uint_t addr, int *arg)
 {
   struct proc *curproc = getproc();
 
+  // 用户态的代码需要做检查（有没有到达程序边界）
   if (addr >= curproc->sz || addr + 4 > curproc->sz)
     return -1;
-  *ip = *(int *)(addr);
+  *arg = *(int *)(addr);
   return 0;
 }
 
-// Fetch the nul-terminated string at addr from the current process.
-// Doesn't actually copy the string - just sets *pp to point at it.
-// Returns length of string, not including nul.
-int fetchstr(uint_t addr, char **pp)
+// 将 addr 的值强转为 char * 赋值给 *parg 
+// 检查用户参数是否越界（用户代码不可信）并返回字符串长度
+int fetchstr(uint_t addr, char **parg)
 {
-  char *s, *ep;
   struct proc *curproc = getproc();
 
+  // 用户态的代码需要做检查（有没有到达程序边界）
   if (addr >= curproc->sz)
     return -1;
-  *pp = (char *)addr;
-  ep = (char *)curproc->sz;
-  for (s = *pp; s < ep; s++)
+  *parg = (char *)addr;
+  char_t end = (char *)curproc->sz;
+  for (char *s = *parg; s < end; s++)
   {
     if (*s == 0)
-      return s - *pp;
+      // 到字符串尾 返回字符串长度
+      return s - *parg;
   }
   return -1;
 }
 
-// Fetch the nth 32-bit system call argument.
-int argint(int n, int *ip)
+// 获取第 n 个 32 位 int 型系统调用参数
+int argint(int n, int *arg)
 {
-  return fetchint((getproc()->tf->esp) + 4 + 4 * n, ip);
+  // 从右往左入栈 参数前还有一个 eip
+  return fetchint((getproc()->tf->esp) + 4 + 4 * n, arg);
 }
 
-// Fetch the nth word-sized system call argument as a pointer
-// to a block of memory of size bytes.  Check that the pointer
-// lies within the process address space.
-int argptr(int n, char **pp, int size)
-{
-  int i;
-  struct proc *curproc = getproc();
-
-  if (argint(n, &i) < 0)
-    return -1;
-  if (size < 0 || (uint_t)i >= curproc->sz || (uint_t)i + size > curproc->sz)
-    return -1;
-  *pp = (char *)i;
-  return 0;
-}
-
-// Fetch the nth word-sized system call argument as a string pointer.
-// Check that the pointer is valid and the string is nul-terminated.
-// (There is no shared writable memory, so the string can't change
-// between this check and being used by the kernel.)
-int argstr(int n, char **pp)
+// 获得第 n 个 char * 类型的系统调用参数
+int argstr(int n, char **parg)
 {
   int addr;
+  // 获得第 n 个位置的值 即字符串开始位置的地址
   if (argint(n, &addr) < 0)
     return -1;
-  return fetchstr(addr, pp);
+  return fetchstr(addr, parg);
 }
 
 // 定义函数指针数组
