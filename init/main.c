@@ -33,9 +33,6 @@ int main(void)
     backtouser();
 
     scheduler();
-
-    while (TRUE)
-        ;
 }
 
 // 临时页目录

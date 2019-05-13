@@ -7,6 +7,9 @@
 #include "proc.h"
 #include "idt.h"
 
+extern struct lock didalock;
+extern uint_t dida;
+
 int sys_fork(void)
 {
   return fork();
@@ -52,35 +55,35 @@ int sys_sbrk(void)
 
 int sys_sleep(void)
 {
-  // int n;
-  // uint_t ticks0;
+  int n;
+  uint_t ticks0;
 
-  // if (argint(0, &n) < 0)
-  //   return -1;
-  // acquire(&tickslock);
-  // ticks0 = ticks;
-  // while (ticks - ticks0 < n)
-  // {
-  //   if (getproc()->killed)
-  //   {
-  //     release(&tickslock);
-  //     return -1;
-  //   }
-  //   sleep(&ticks, &tickslock);
-  // }
-  // release(&tickslock);
-   return 0;
+  if (argint(0, &n) < 0)
+    return -1;
+  acquire(&didalock);
+  ticks0 = dida;
+  while (dida - ticks0 < n)
+  {
+    if (getproc()->killed)
+    {
+      release(&didalock);
+      return -1;
+    }
+    sleep(&dida, &didalock);
+  }
+  release(&didalock);
+  return 0;
 }
 
 // return how many clock tick interrupts have occurred
 // since start.
 int sys_uptime(void)
 {
-  // uint_t xticks;
+  uint_t xticks;
 
-  // acquire(&tickslock);
-  // xticks = ticks;
-  // release(&tickslock);
-  // return xticks;
+  acquire(&didalock);
+  xticks = dida;
+  release(&didalock);
+  return xticks;
   return 0;
 }

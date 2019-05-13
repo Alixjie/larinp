@@ -6,7 +6,6 @@
 #include "vmm.h"
 #include "string.h"
 
-
 int sys_exec(void)
 {
   char *path, *argv[MAXARG];
@@ -32,6 +31,5 @@ int sys_exec(void)
     if (fetchstr(uarg, &argv[i]) < 0)
       return -1;
   }
-  //return exec(path, argv);
-  return 1;
+  return exec(path, argv);
 }

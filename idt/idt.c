@@ -8,6 +8,13 @@
 #include "lock.h"
 #include "debug.h"
 
+struct lock test;
+
+int_t testi = 0;
+
+
+
+
 struct gatedesc idt[256];
 extern uint_t intrs[];
 struct lock didalock;
@@ -29,6 +36,8 @@ void idt_init(void)
     lidt(idt, sizeof(idt));
 
     initlock(&didalock, "time");
+
+    initlock(&test, "test");
 }
 
 void intr(struct trapframe *tf)
@@ -55,6 +64,28 @@ void intr(struct trapframe *tf)
         dida++;
         // 唤醒全部睡在 dida 上的进程 若时间到则 继续执行 没还没到时间 继续 sleep
         wakeup(&dida);
+
+
+
+
+
+
+        if ((!testi) && (dida == 0x300))
+        {
+            testi = 1;
+            acquire(&test);
+            sleep(&dida, &test);
+            release(&test);
+        }
+
+        if (testi && (dida == 0x500))
+        {
+            testi = 0;
+            wakeup(&dida);
+        }
+
+
+
         // 测试是否进入了时钟中断
         printk("dida %08x\n", dida);
         release(&didalock);
