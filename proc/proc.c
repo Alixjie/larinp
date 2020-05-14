@@ -143,8 +143,22 @@ void scheduler(void)
     {
         // 开启中断
         sti();
+        int foundproc = FALSE;
+
+        for (struct proc *p = proctab.proc; p < &proctab.proc[NPROC]; ++p)
+        {
+            if (p->state == RUNNABLE)
+            {
+                foundproc = TRUE;
+                break;
+            }
+        }
+        if (!foundproc)
+            hlt();
+        
 
         acquire(&proctab.lock);
+        // 会存在进程饥饿的情况
         for (struct proc *p = proctab.proc; p < &proctab.proc[NPROC]; ++p)
         {
             if (p->state != RUNNABLE)
